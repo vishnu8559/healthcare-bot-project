@@ -176,7 +176,8 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == '__main__':
     TOKEN = "8279777997:AAGKbKWpJt2fxzxlGK9SDuWvMTn4-wsub8c"  # Replace with your actual token
     
-    app = ApplicationBuilder().token(TOKEN).build()
+    application = Application.builder().token(TOKEN).build()
+
     
     # Conversation handler
     conv_handler = ConversationHandler(
