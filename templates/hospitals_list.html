@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Manage Hospitals</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container-main {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .table-responsive {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            margin-bottom: 0;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+        }
+
+        td {
+            vertical-align: middle;
+            padding: 12px;
+        }
+
+        .area-badge {
+            display: inline-block;
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .location-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .location-badge.warning {
+            background: #fff3cd;
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .location-badge.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #155724;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .back-link {
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            color: #007bff;
+            font-size: 24px;
+        }
+
+        .stat-card p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .table-header-info {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            color: #0066cc;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-main">
+        <!-- Back Button -->
+        <div class="back-link">
+            <a href="/" class="btn btn-secondary">← Back to Home</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>🏥 Manage Hospitals</h1>
+            <a href="/admin/hospitals/add" class="btn btn-success btn-lg">+ Add Hospital</a>
+        </div>
+
+        <!-- Statistics -->
+        {% if hospitals %}
+        <div class="stats">
+            <div class="stat-card">
+                <h3>{{ hospitals|length }}</h3>
+                <p>Total Hospitals</p>
+            </div>
+            <div class="stat-card">
+                <h3>
+                    {% set coords_count = hospitals|selectattr('5')|list|length %}
+                    {{ coords_count }}
+                </h3>
+                <p>With Coordinates</p>
+            </div>
+            <div class="stat-card">
+                <h3>
+                    {% set no_coords = hospitals|length - (hospitals|selectattr('5')|list|length) %}
+                    {{ no_coords }}
+                </h3>
+                <p>Need Coordinates</p>
+            </div>
+        </div>
+
+        <div class="table-header-info">
+            💡 <strong>Tip:</strong> Click "✏️ Edit" to add latitude and longitude coordinates. These are essential for
+            the Telegram bot's location feature!
+        </div>
+        {% endif %}
+
+        <!-- Hospitals Table -->
+        <div class="table-responsive">
+            {% if hospitals %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 200px;">Hospital Name</th>
+                        <th style="width: 120px;">Area</th>
+                        <th style="width: 220px;">Address</th>
+                        <th style="width: 140px;">Phone</th>
+                        <th style="width: 200px;">📍 Coordinates</th>
+                        <th style="width: 140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hospital in hospitals %}
+                    <tr>
+                        <td><strong>{{ loop.index }}</strong></td>
+                        <td><strong>{{ hospital[1] }}</strong></td>
+                        <td><span class="area-badge">{{ hospital[2] }}</span></td>
+                        <td>
+                            <small>{{ hospital[3][:50] }}{% if hospital[3] and hospital[3]|length > 50 %}...{% endif
+                                %}</small>
+                        </td>
+                        <td><small>{{ hospital[4] or '—' }}</small></td>
+                        <td>
+                            {% if hospital[5] and hospital[6] %}
+                            <span class="location-badge success">
+                                ✅ {{ "%.4f"|format(hospital[5]) }}, {{ "%.4f"|format(hospital[6]) }}
+                            </span>
+                            {% else %}
+                            <span class="location-badge warning">
+                                ⚠️ Not set
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/admin/hospital/{{ hospital[0] }}/edit" class="btn btn-primary btn-sm">✏️
+                                    Edit</a>
+                                <a href="/admin/hospital/{{ hospital[0] }}/delete" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Are you sure? This cannot be undone.');">🗑️ Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="text-muted mt-3">
+                <strong>Total:</strong> {{ hospitals|length }} hospitals
+                |
+                <strong>With Coordinates:</strong> {{ hospitals|selectattr('5')|list|length }}
+                |
+                <strong>Need Coordinates:</strong> {{ hospitals|length - (hospitals|selectattr('5')|list|length) }}
+            </p>
+            {% else %}
+            <div class="empty-state">
+                <h3>📭 No Hospitals Found</h3>
+                <p>Start by adding your first hospital</p>
+                <a href="/admin/hospitals/add" class="btn btn-success">+ Add Hospital</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

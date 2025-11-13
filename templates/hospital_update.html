@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Update Doctors - {{ hospital.name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(120deg, #e3ecf7 0%, #cfdcf3 100%);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffffcc;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0, 80, 200, 0.10);
+            padding: 36px 48px 32px 48px;
+        }
+
+        h1 {
+            color: #2452a6;
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #438AC9;
+            margin-top: 32px;
+        }
+
+        .info-section {
+            margin-bottom: 22px;
+            font-size: 1.15rem;
+            color: #333333;
+        }
+
+        .info-section strong {
+            color: #1d2d46;
+        }
+
+        ul {
+            margin-left: 15px;
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            font-size: 1.2rem;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #f3f9fc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            border: 1.5px solid #5db7e9;
+            padding: 14px 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #337ccf;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        tr:nth-child(even) {
+            background: #eaf7fc;
+        }
+
+        tr:hover {
+            background: #e0e5f6;
+        }
+
+        input[type="number"],
+        input[type="checkbox"] {
+            font-size: 1.12rem;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1.5px solid #98badc;
+            outline: none;
+            margin-bottom: 0;
+        }
+
+        input[type="number"]:focus,
+        input[type="checkbox"]:focus {
+            border-color: #337ccf;
+            box-shadow: 0 0 2px #337ccf;
+        }
+
+        input[type="checkbox"]:hover,
+        input[type="number"]:hover {
+            background-color: #fffbe6;
+        }
+
+        .back-link {
+            font-size: 1.08rem;
+            color: #337ccf;
+            text-decoration: underline;
+            margin-top: 36px;
+            display: inline-block;
+        }
+
+        button {
+            font-size: 1.12rem;
+            background: #337ccf;
+            color: white;
+            border-radius: 4px;
+            padding: 8px 16px;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2452a6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>{{ hospital.name }}</h1>
+        <div class="info-section">
+            <p><strong>Area:</strong> {{ hospital.area }}</p>
+            <p><strong>Address:</strong> {{ hospital.address }}</p>
+            <p><strong>Phone:</strong> {{ hospital.phone }}</p>
+        </div>
+
+        <!-- Hospital Stats Dashboard -->
+        <h2>Today's Hospital Stats</h2>
+        <form method="POST">
+            <table>
+                <tr>
+                    <th>Patients Visited</th>
+                    <td><input type="number" name="patients_visited" min="0" value="{{ stats.patients_visited }}"></td>
+                </tr>
+                <tr>
+                    <th>Patients Joined</th>
+                    <td><input type="number" name="patients_joined" min="0" value="{{ stats.patients_joined }}"></td>
+                </tr>
+                <tr>
+                    <th>Patients Discharged</th>
+                    <td><input type="number" name="patients_discharged" min="0" value="{{ stats.patients_discharged }}">
+                    </td>
+                </tr>
+                <tr>
+                    <th>Emergency Cases</th>
+                    <td><input type="number" name="emergency_cases" min="0" value="{{ stats.emergency_cases }}"></td>
+                </tr>
+                <tr>
+                    <th>Deaths</th>
+                    <td><input type="number" name="deaths" min="0" value="{{ stats.deaths }}"></td>
+                </tr>
+            </table>
+            <button type="submit">Update Stats</button>
+        </form>
+
+        <h2>Departments</h2>
+        <ul>
+            {% for dep in departments %}
+            <li>{{ dep.name }}</li>
+            {% else %}
+            <li>No departments found.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Doctors</h2>
+        <form id="updateForm">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th>Specialization</th>
+                        <th>Department</th>
+                        <th>Available</th>
+                        <th>Waiting Patients</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in doctors %}
+                    <tr>
+                        <td>{{ doc.doctor_name }}</td>
+                        <td>{{ doc.specialization }}</td>
+                        <td>{{ doc.department_name }}</td>
+                        <td>
+                            <input type="checkbox" id="available_{{ doc.doctor_id }}" {% if doc.available %}checked{%
+                                endif %} onchange="updateDoctor({{ doc.doctor_id }})">
+                        </td>
+                        <td>
+                            <input type="number" min="0" id="waiting_{{ doc.doctor_id }}"
+                                value="{{ doc.waiting_patients }}" onchange="updateDoctor({{ doc.doctor_id }})">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        <a href="/hospital/{{ hospital.hospital_id }}" class="back-link">Back to Hospital Details</a>
+    </div>
+    <script>
+        function updateDoctor(doctor_id) {
+            const available = document.getElementById('available_' + doctor_id).checked ? 1 : 0;
+            const waiting_patients = document.getElementById('waiting_' + doctor_id).value;
+            fetch('/api/doctor_update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    doctor_id: doctor_id,
+                    available: available,
+                    waiting_patients: waiting_patients
+                })
+            });
+        }
+    </script>
+</body>
+
+</html>

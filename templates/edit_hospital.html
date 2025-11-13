@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Hospital</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            background: #f8f9ff;
+        }
+
+        .location-section {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .location-section h4 {
+            color: #007bff;
+            margin-top: 0;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .location-section p {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .location-section a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .location-section a:hover {
+            text-decoration: underline;
+        }
+
+        .location-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .example-box {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            border-left: 3px solid #007bff;
+        }
+
+        .example-box strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #007bff;
+        }
+
+        .example-box p {
+            margin: 5px 0;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+            text-decoration: none;
+        }
+
+        .info-tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 25px;
+            border-radius: 3px;
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .location-warning {
+            background: #fce4ec;
+            border-left: 4px solid #f44336;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            color: #c62828;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h1>✏️ Edit Hospital Details</h1>
+
+        <div class="info-tip">
+            💡 <strong>Update Hospital Information:</strong> Modify hospital details including location coordinates to
+            help patients find you easily via Telegram bot.
+        </div>
+
+        <form method="POST">
+            <!-- Hospital Name -->
+            <div class="form-group">
+                <label for="name">🏥 Hospital Name *</label>
+                <input type="text" id="name" name="name" value="{{ hospital[1] or '' }}" required>
+            </div>
+
+            <!-- Area -->
+            <div class="form-group">
+                <label for="area">📍 Area/City *</label>
+                <input type="text" id="area" name="area" value="{{ hospital[2] or '' }}" placeholder="e.g., Kukatpally"
+                    required>
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+                <label for="address">📌 Full Address</label>
+                <textarea id="address" name="address" rows="3"
+                    placeholder="Enter complete hospital address">{{ hospital[3] or '' }}</textarea>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+                <label for="phone">📞 Phone Number</label>
+                <input type="tel" id="phone" name="phone" value="{{ hospital[4] or '' }}"
+                    placeholder="e.g., 040-1234567">
+            </div>
+
+            <!-- Location Section -->
+            <div class="location-section">
+                <h4>📍 Location Coordinates (Important for GPS Features)</h4>
+
+                <div class="location-warning">
+                    ⚠️ <strong>Important:</strong> Adding coordinates helps users find your hospital via our Telegram
+                    bot location feature!
+                </div>
+
+                <p>
+                    <strong>How to get coordinates from Google Maps:</strong><br>
+                    1. Open <a href="https://maps.google.com" target="_blank">Google Maps</a><br>
+                    2. Search for your hospital name<br>
+                    3. Right-click on the exact hospital location pin<br>
+                    4. You'll see coordinates like: <strong>17.4936° N, 78.3995° E</strong><br>
+                    5. Copy the numbers and paste below
+                </p>
+
+                <div class="location-inputs">
+                    <div class="form-group">
+                        <label for="lat">Latitude *</label>
+                        <input type="number" id="lat" name="lat" step="0.00001" value="{{ hospital[5] or '' }}"
+                            placeholder="e.g., 17.4936">
+                        <div class="help-text">Format: XX.XXXXX (e.g., 17.4936)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lon">Longitude *</label>
+                        <input type="number" id="lon" name="lon" step="0.00001" value="{{ hospital[6] or '' }}"
+                            placeholder="e.g., 78.3995">
+                        <div class="help-text">Format: XX.XXXXX (e.g., 78.3995)</div>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <strong>📌 Example - Apollo Hospital Kukatpally:</strong>
+                    <p><strong>Latitude:</strong> 17.4936</p>
+                    <p><strong>Longitude:</strong> 78.3995</p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn-save">✅ Save Changes</button>
+                <a href="/admin/hospitals" class="btn-cancel">❌ Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>{{ hospital.name }}</title>
+</head>
+
+<body>
+    <h1>{{ hospital.name }}</h1>
+    <p><strong>Area:</strong> {{ hospital.area }}</p>
+    <p><strong>Address:</strong> {{ hospital.address }}</p>
+    <p><strong>Phone:</strong> {{ hospital.phone }}</p>
+
+    <h2>Departments</h2>
+    <ul>
+        {% for dep in departments %}
+        <li>{{ dep.name }}</li>
+        {% else %}
+        <li>No departments found.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Doctors</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Doctor Name</th>
+                <th>Specialization</th>
+                <th>Department</th>
+                <th>Available</th>
+                <th>Waiting Patients</th>
+            </tr>
+        </thead>
+        <tbody id="doctors_tbody">
+            {% for doc in doctors %}
+            <tr>
+                <td>{{ doc.doctor_name }}</td>
+                <td>{{ doc.specialization }}</td>
+                <td>{{ doc.department_name }}</td>
+                <td>{{ "Yes" if doc.available else "No" }}</td>
+                <td>{{ doc.waiting_patients }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No doctors found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function fetchDoctors() {
+            fetch('/api/hospital/{{ hospital["hospital_id"] }}/doctors')
+                .then(resp => resp.json())
+                .then(doctors => {
+                    let tbody = document.getElementById("doctors_tbody");
+                    tbody.innerHTML = "";
+                    doctors.forEach(function (doc) {
+                        let tr = document.createElement("tr");
+                        tr.innerHTML =
+                            `<td>${doc.doctor_name}</td>
+                         <td>${doc.specialization}</td>
+                         <td>${doc.department_name}</td>
+                         <td>${doc.available ? "Yes" : "No"}</td>
+                         <td>${doc.waiting_patients}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        fetchDoctors();
+        setInterval(fetchDoctors, 10000);
+    </script>
+</body>
+
+</html>

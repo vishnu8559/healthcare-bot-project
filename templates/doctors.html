@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Manage Doctors</title>
+</head>
+
+<body>
+    <h2>Add Doctor</h2>
+    <form method="POST">
+        <select name="hospital_id" required>
+            <option value="">Select Hospital</option>
+            {% for h in hospitals %}
+            <option value="{{ h.hospital_id }}">{{ h.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="department_id" required>
+            <option value="">Select Department</option>
+            {% for d in departments %}
+            <option value="{{ d.department_id }}">{{ d.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="doctor_name" placeholder="Doctor Name" required>
+        <input type="text" name="specialization" placeholder="Specialization" required>
+        <label>
+            <input type="checkbox" name="available"> Available
+        </label>
+        <input type="number" name="waiting_patients" placeholder="Patients Waiting">
+        <button type="submit">Add Doctor</button>
+    </form>
+
+    <h3>Existing Doctors</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Available</th>
+                <th>Waiting Patients</th>
+                <th>Hospital</th>
+                <th>Department</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in doctors %}
+            <tr>
+                <td>{{ doc.doctor_name }}</td>
+                <td>{{ doc.specialization }}</td>
+                <td>{{ "Yes" if doc.available else "No" }}</td>
+                <td>{{ doc.waiting_patients }}</td>
+                <td>{{ doc.hospital_name }}</td>
+                <td>{{ doc.department_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

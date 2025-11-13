@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Manage Departments</title>
+</head>
+
+<body>
+    <h2>Add Department</h2>
+    <form method="POST">
+        <select name="hospital_id" required>
+            <option value="">Select Hospital</option>
+            {% for h in hospitals %}
+            <option value="{{ h.hospital_id }}">{{ h.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="name" placeholder="Department Name" required>
+        <button type="submit">Add</button>
+    </form>
+
+    <h3>Existing Departments</h3>
+    <ul>
+        {% for d in departments %}
+        <li>{{ d.name }} ({{ d.hospital_name }})</li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
