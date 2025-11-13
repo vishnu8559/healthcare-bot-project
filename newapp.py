@@ -1,10 +1,12 @@
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 import sqlite3
 import math
 
+
 # Conversation states
 WAITING_FOR_SYMPTOM, ASKING_HOSPITAL, WAITING_FOR_LOCATION = range(3)
+
 
 # Haversine distance calculation
 def haversine(lat1, lon1, lat2, lon2):
@@ -17,6 +19,7 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     return R * c
 
+
 # Get hospitals from database
 def get_hospitals_by_area(area):
     conn = sqlite3.connect('healthcare.db')
@@ -24,6 +27,7 @@ def get_hospitals_by_area(area):
     results = cursor.fetchall()
     conn.close()
     return results
+
 
 def get_nearby_hospitals(user_lat, user_lon, n=5):
     conn = sqlite3.connect('healthcare.db')
@@ -43,6 +47,7 @@ def get_nearby_hospitals(user_lat, user_lon, n=5):
     hospitals_with_dist.sort(key=lambda x: x[3])
     return hospitals_with_dist[:n]
 
+
 # Health advice based on symptoms
 def get_health_advice(symptom):
     symptom_lower = symptom.lower()
@@ -60,6 +65,7 @@ def get_health_advice(symptom):
     else:
         return "I hope you feel better soon. Make sure to rest and take care of yourself."
 
+
 # Start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -68,6 +74,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "(For example: 'I have a fever' or 'I have a headache')"
     )
     return WAITING_FOR_SYMPTOM
+
 
 # Handle symptom input
 async def handle_symptom(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,6 +98,7 @@ async def handle_symptom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     return ASKING_HOSPITAL
+
 
 # Handle hospital choice
 async def handle_hospital_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -116,6 +124,7 @@ async def handle_hospital_choice(update: Update, context: ContextTypes.DEFAULT_T
         )
         return ConversationHandler.END
 
+
 # Handle location sharing
 async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     location = update.message.location
@@ -138,6 +147,7 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(msg, parse_mode='Markdown', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
+
 
 # Handle area text input
 async def handle_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -164,6 +174,7 @@ async def handle_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, parse_mode='Markdown', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
+
 # Cancel conversation
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -172,12 +183,12 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return ConversationHandler.END
 
+
 # Main
 if __name__ == '__main__':
-    TOKEN = "8279777997:AAGKbKWpJt2fxzxlGK9SDuWvMTn4-wsub8c"  # Replace with your actual token
+    TOKEN = "8279777997:AAGKbKWpJt2fxzxlGK9SDuWvMTn4-wsub8c"
     
     application = Application.builder().token(TOKEN).build()
-
     
     # Conversation handler
     conv_handler = ConversationHandler(
@@ -193,8 +204,8 @@ if __name__ == '__main__':
         fallbacks=[CommandHandler('cancel', cancel)],
     )
     
-    app.add_handler(conv_handler)
+    application.add_handler(conv_handler)
     
     print("🤖 Healthcare Bot is running...")
     print("Open Telegram and chat with your bot!")
-    app.run_polling()
+    application.run_polling()
